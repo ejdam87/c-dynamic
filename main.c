@@ -11,11 +11,8 @@ int main() {
     }
 
     print_list(list, print_int);
-
     struct node *nth = pop_nth_list(list, 9);
-
     print_list(list, print_int);
-
     destroy_list(list);
 
     return 0;

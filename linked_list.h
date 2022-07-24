@@ -24,26 +24,36 @@ typedef struct linked_list {
 } linked_list;
 
 
+// --- Example helpers
 void print_int(void*);
 bool compare_int(void*, void*);
+// ---
 
+// --- memory-handling functions
 struct node *create_node(void);
 void destroy_node(struct node*);
 void delete_node(struct node*);
 void detach_node(linked_list*, struct node*);
 
-int append_to_list(linked_list*, void*);
-int prepend_to_list(linked_list*, void*);
-struct node* pop_from_list(linked_list*);
-struct node* popleft_from_list(linked_list*);
-struct node* search_list(linked_list*, void*, bool (*comparator) (void*, void*));
-void print_list(linked_list*, void (*elem_printer) (void*));
 linked_list *init_list(size_t);
 void destroy_list(linked_list*);
 
-struct node *get_nth_list(linked_list*, size_t);
-void remove_nth_list(linked_list*, size_t);
-struct node *pop_nth_list(linked_list*, size_t);
+// ---
+
+// --- List operations + worst case complexity ( n - length of list )
+
+int append_to_list(linked_list*, void*);                                            // O(1)
+int prepend_to_list(linked_list*, void*);                                           // O(1)
+struct node* pop_from_list(linked_list*);                                           // O(1)
+struct node* popleft_from_list(linked_list*);                                       // O(1)
+struct node* search_list(linked_list*, void*, bool (*comparator) (void*, void*));   // O(n)
+void print_list(linked_list*, void (*elem_printer) (void*));                        // O(n)
+
+struct node *get_nth_list(linked_list*, size_t);                                    // O(n)
+void remove_nth_list(linked_list*, size_t);                                         // O(n)
+struct node *pop_nth_list(linked_list*, size_t);                                    // O(n)
+
+// ---
 
 #endif
 
