@@ -44,14 +44,14 @@ void destroy_list(linked_list*);
 
 int append_to_list(linked_list*, void*);                                            // O(1)
 int prepend_to_list(linked_list*, void*);                                           // O(1)
-struct node* pop_from_list(linked_list*);                                           // O(1)
-struct node* popleft_from_list(linked_list*);                                       // O(1)
-struct node* search_list(linked_list*, void*, bool (*comparator) (void*, void*));   // O(n)
+int pop_from_list(linked_list*, void*);                                             // O(1)
+int popleft_from_list(linked_list*, void*);                                         // O(1)
+void* search_list(linked_list*, void*, bool (*comparator) (void*, void*));          // O(n)
 void print_list(linked_list*, void (*elem_printer) (void*));                        // O(n)
 
-struct node *get_nth_list(linked_list*, size_t);                                    // O(n)
+void* get_nth_list(linked_list*, size_t);                                           // O(n)
 void remove_nth_list(linked_list*, size_t);                                         // O(n)
-struct node *pop_nth_list(linked_list*, size_t);                                    // O(n)
+int pop_nth_list(linked_list*, size_t, void*);                                      // O(n)
 
 // ---
 

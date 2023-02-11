@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SUCCESS 0
+#define FAILURE 1
+
 // --- Example helpers
 
 void print_int(void *elem){
@@ -40,11 +43,9 @@ void destroy_list(linked_list *list){
 
         next = node -> next;
 
-        destroy_node(node);
-        free(node);
+        delete_node( node );
 
         node = next;
-
     }
 
     free(list);
@@ -69,12 +70,12 @@ struct node *create_node(void){
 int fill_node(linked_list *list, struct node *node, void *elem){
 
     if (node == NULL){
-        return 1;
+        return FAILURE;
     }
 
     node -> data = malloc(list -> elem_size);
     memcpy(node -> data, elem, list -> elem_size);
-    return 0;
+    return SUCCESS;
 
 }
 
@@ -118,8 +119,9 @@ void detach_node(linked_list *list, struct node *node){
 int append_to_list(linked_list *list, void *elem){
 
     struct node *node = create_node();
-    if (fill_node(list, node, elem) == 1){
-        return 1;
+    if (fill_node(list, node, elem) == FAILURE){
+        delete_node( node );
+        return FAILURE;
     }
 
     if (list -> last == NULL){
@@ -127,7 +129,7 @@ int append_to_list(linked_list *list, void *elem){
         list -> first = node;
         list -> last = node;
         list -> length++;
-        return 0;
+        return SUCCESS;
 
     }
 
@@ -135,22 +137,23 @@ int append_to_list(linked_list *list, void *elem){
     node -> prev = list -> last;
     list -> last = node;
     list -> length++;
-    return 0;
+    return SUCCESS;
 
 }
 
 int prepend_to_list(linked_list *list, void *elem){
 
     struct node *node = create_node();
-    if (fill_node(list, node, elem) == 1){
-        return 1;
+    if (fill_node(list, node, elem) == FAILURE){
+        delete_node( node );
+        return FAILURE;
     }
 
     if (list -> first == NULL){
         list -> first = node;
         list -> last = node;
         list -> length++;
-        return 0;
+        return SUCCESS;
     }
 
     node -> next = list -> first;
@@ -158,14 +161,14 @@ int prepend_to_list(linked_list *list, void *elem){
     list -> first = node;
     list -> length++;
 
-    return 0;
+    return SUCCESS;
 
 }
 
-struct node* pop_from_list(linked_list *list){
+int pop_from_list( linked_list *list, void* place ){
 
     if (list -> length == 0){
-        return NULL;
+        return FAILURE;
     }
 
     struct node *lst = list -> last;
@@ -185,14 +188,18 @@ struct node* pop_from_list(linked_list *list){
     }
 
     list -> length--;
-    return lst;
+
+    memcpy( place, lst -> data, list -> elem_size );
+    delete_node( lst );
+
+    return SUCCESS;
 
 }
 
-struct node* popleft_from_list(linked_list *list){
+int popleft_from_list(linked_list *list, void* place){
 
     if (list -> first == NULL){
-        return NULL;
+        return FAILURE;
     }
 
     struct node *fst = list -> first;
@@ -212,16 +219,20 @@ struct node* popleft_from_list(linked_list *list){
     }
 
     list -> length--;
-    return fst;
+
+    memcpy( place, fst -> data, list -> elem_size );
+    delete_node( fst );
+
+    return SUCCESS;
 
 }
 
-struct node *search_list(linked_list *list, void* val, bool (*comparator) (void*, void*)){
+void* search_list(linked_list *list, void* val, bool (*comparator) (void*, void*)){
 
     for (struct node *current = list -> first; current != NULL; current = current -> next){
 
         if (comparator(current -> data, val)){
-            return current;
+            return current -> data;
         }
     }
 
@@ -229,8 +240,7 @@ struct node *search_list(linked_list *list, void* val, bool (*comparator) (void*
 
 }
 
-
-struct node *get_nth_list(linked_list *list, size_t n){
+void* get_nth_list(linked_list *list, size_t n){
 
     if (n >= list -> length){
         return NULL;
@@ -248,13 +258,27 @@ struct node *get_nth_list(linked_list *list, size_t n){
 
     }
 
-    return nth_node;
+    return nth_node -> data;
 
 }
 
 void remove_nth_list(linked_list *list, size_t n){
 
-    struct node *nth_node = get_nth_list(list, n);
+    if (n >= list -> length){
+        return;
+    }
+
+    struct node *nth_node = list -> first;
+
+    for (int i = 0; i < n; i++){
+
+        if (nth_node == NULL){
+            return;
+        }
+
+        nth_node = nth_node -> next;
+
+    }
 
     if (nth_node == NULL){
         return;
@@ -266,16 +290,35 @@ void remove_nth_list(linked_list *list, size_t n){
 
 }
 
-struct node *pop_nth_list(linked_list *list, size_t n){
+int pop_nth_list(linked_list *list, size_t n, void* place){
 
-    struct node *nth_node = get_nth_list(list, n);
+    if (n >= list -> length){
+        return FAILURE;
+    }
+
+    struct node *nth_node = list -> first;
+
+    for (int i = 0; i < n; i++){
+
+        if (nth_node == NULL){
+            return FAILURE;
+        }
+
+        nth_node = nth_node -> next;
+
+    }
+
     if (nth_node == NULL){
-        return NULL;
+        return FAILURE;
     }
 
     detach_node(list, nth_node);
     list -> length--;
-    return nth_node;
+
+    memcpy( place, nth_node -> data, list -> elem_size );
+    delete_node( nth_node );
+
+    return SUCCESS;
 
 }
 
